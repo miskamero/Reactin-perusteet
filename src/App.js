@@ -29,7 +29,6 @@ const App = () => {
       <br/><br/>
       <button onClick={() => setSelected(Math.floor(Math.random() * anecdotes.length))}>next anecdote</button>
       <button onClick={handleVote}>vote</button>
-      <button onClick={console.log(votePoints)}>Show arrays in console</button>
       <br/><br/>
       <h1>Anecdote with most votes</h1>
       <p>{anecdotes[
