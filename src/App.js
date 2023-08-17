@@ -1,79 +1,44 @@
-const Header = (props) => {
-  console.log(props);
-  return (
-      <h1>{props.course}</h1>
-  );
-};
+import { useState } from 'react'
 
-// const Content = (props) => {
-//   return (
-//     <div>
-//       <p>{props.parts[0].name} {props.parts[0].exercises}</p>
-//       <p>{props.parts[1].name} {props.parts[1].exercises}</p>
-//       <p>{props.parts[2].name} {props.parts[2].exercises}</p>
-//     </div>
-//   );
-// };
-
-const Part1 = (props) => {
-  return (
-    <p>{props.parts[0].name} {props.parts[0].exercises}</p>
-  );
-};
-
-const Part2 = (props) => {
-  return (
-    <p>{props.parts[1].name} {props.parts[1].exercises}</p>
-  );
-};
-
-const Part3 = (props) => {
-  return (
-    <p>{props.parts[2].name} {props.parts[2].exercises}</p>
-  );
-};
-
-const Content = (props) => {
-  return (
-    <div>
-      <Part1 parts={props.parts} />
-      <Part2 parts={props.parts} />
-      <Part3 parts={props.parts} />
-    </div>
-  )
+const Stats = ({good, neutral, bad, all }) => {
+  if (all >= 1){
+    return (
+      <div>
+        <h1>statistics</h1>
+        <p>good {good}</p>
+        <p>neutral {neutral}</p>
+        <p>bad {bad}</p>
+        <p>all {all}</p>
+        <p>positive {good / all * 100} %</p>
+      </div>
+    )
+  } else{
+    return (
+      <div>
+        <h1>statistics</h1>
+        <p>No feedback given</p>
+      </div>
+    )
+  }
 }
 
-const Total = (props) => {
-  return (
-    <p>Number of exercises: {props.parts[0].exercises + props.parts[1].exercises + props.parts[2].exercises}</p>
-  );
-};
 
 const App = () => {
-  // const-määrittelyt
-  const course = 'Half Stack application development';
-  const parts = [
-    {
-      name: 'Fundamentals of React',
-      exercises: 10
-    },
-    {
-      name: 'Using props to pass data',
-      exercises: 7
-    },
-    {
-      name: 'State of a component',
-      exercises: 14
-    }
-  ];
+  // tallenna napit omaan tilaansa
+  const [good, setGood] = useState(0)
+  const [neutral, setNeutral] = useState(0)
+  const [bad, setBad] = useState(0)
+  const all = good + neutral + bad
+
   return (
     <div>
-      <Header course={course} />
-      <Content parts={parts} />
-      <Total parts={parts}/>
+      <h1>give feedback</h1>
+      <button onClick={() => setGood(good + 1)}>good</button>
+      <button onClick={() => setNeutral(neutral + 1)}>neutral</button>
+      <button onClick={() => setBad(bad + 1)}>bad</button>
+      <Stats good={good} neutral={neutral} bad={bad} all={all} />
     </div>
   )
 }
-// vahingossa tehty 1.1-1.5 tehtävät samalla kun tein 1.1-1.2
 
 export default App
