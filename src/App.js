@@ -74,5 +74,6 @@ const App = () => {
     </div>
   )
 }
+// vahingossa tehty 1.1-1.5 tehtävät samalla kun tein 1.1-1.2
 
 export default App
