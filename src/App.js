@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
 const Filter = ({ filter, setFilter }) => {
   return (
     <div>
@@ -90,12 +90,18 @@ const App = () => {
       return;
     } else {
       const newPerson = { name: newName, number: newNumber };
-      setPersons([...persons, newPerson]);
-      setNewName('');
-      setNewNumber('');
+      axios.post('http://localhost:3001/persons', newPerson)
+        .then(response => {
+          const addedPerson = response.data;
+          setPersons([...persons, addedPerson]);
+          setNewName('');
+          setNewNumber('');
+        })
+        .catch(error => {
+          console.error('Error adding person:', error);
+        });
     }
   };
-
   const filteredPersons = persons.filter(person => {
     const personName = person.name.toLowerCase(); // personName is the value of the name property of the person object. It is converted to lowercase to make the search case insensitive
     const personNumber = person.number.toLowerCase(); // personNumber is the value of the number property of the person object. It is converted to lowercase to make the search case insensitive
@@ -103,6 +109,34 @@ const App = () => {
 
     return personName.includes(filterText) || personNumber.includes(filterText); // returns true or false for each person object in the array
   });
+
+//   setTimeout(() => {
+//   axios.get('http://localhost:3001/persons').then(response => {
+//   // Delay the update by 2 seconds using setTimeout
+//     setPersons(response.data);
+//     console.log(response);
+//   }).catch(error => {
+//     console.error('Error fetching data:', error);
+//   });
+// }, 2000);
+
+useEffect(() => {
+  fetchData();
+  const intervalId = setInterval(() => {
+    fetchData();
+  }, 2000);
+  return () => clearInterval(intervalId);
+}, []);
+const fetchData = () => {
+  axios.get('http://localhost:3001/persons')
+    .then(response => {
+      setPersons(response.data);
+      console.log(response);
+    })
+    .catch(error => {
+      console.error('Error fetching data:', error);
+    });
+};
 
   return (
     <div>
