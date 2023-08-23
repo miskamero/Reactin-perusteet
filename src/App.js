@@ -109,18 +109,7 @@ const App = () => {
 
     return personName.includes(filterText) || personNumber.includes(filterText); // returns true or false for each person object in the array
   });
-
-//   setTimeout(() => {
-//   axios.get('http://localhost:3001/persons').then(response => {
-//   // Delay the update by 2 seconds using setTimeout
-//     setPersons(response.data);
-//     console.log(response);
-//   }).catch(error => {
-//     console.error('Error fetching data:', error);
-//   });
-// }, 2000);
-
-useEffect(() => {
+  useEffect(() => {
   fetchData();
   const intervalId = setInterval(() => {
     fetchData();
