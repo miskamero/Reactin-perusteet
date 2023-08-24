@@ -3,22 +3,39 @@ import personService  from './services/personService';
 import './App.css';
 const Filter = ({ filter, setFilter }) => {
   return (
-    <div>
+    <div className="filterClass">
       Filter with:{" "}
       <input type="text" value={filter} onChange={(e) => setFilter(e.target.value)} />
     </div>
   );
 };
-const PersonList = ({ filteredPersons }) => {
+const PersonList = ({ filteredPersons, addedPerson }) => {
   return (
     <div>
       <h2>Numbers</h2>
-      {filteredPersons.map((person, index) => (
-        <div key={person.name}>
-          <p>{person.name}: {person.number}</p>
-          <button onClick={() => personService.deletePerson(person.id)}>Delete</button>
+      <div className="contactsContainer">
+        {filteredPersons.map((person) => (
+          <div className="namesAndButtonsGrid" key={person.name}>
+            <p>{person.name}: <br/>{person.number}</p>
+            <button onClick={() =>{ 
+              if (window.confirm(`Are you sure you want to delete ${person.name}?`)) {
+                addedPerson.innerHTML = `Deleted ${person.name} from the phonebook`;
+                addedPerson.style.color = 'red';
+                addedPerson.style.opacity = '1';
+                addedPerson.style.transition = 'opacity 1.5s';
+                addedPerson.style.border = '1px solid red';
+                setTimeout(() => {
+                  personService.deletePerson(person.id).then(window.location.reload());
+                  addedPerson.style.opacity = '0';
+                }
+                , 1000);
+              }else {
+                return;
+              }
+            }}>Delete</button>
         </div>
       ))}
+      </div>
     </div>
   );
 };
@@ -31,14 +48,12 @@ const PersonForm = ({
   addPerson,
 }) => {
   return (
-    <form onSubmit={addPerson}>
-      <div>
+    <form onSubmit={addPerson} className="formClass">
+      <div className="inputNameAndNumber">
         name: <input value={newName} onChange={handleNameChange} /><br/>
         number: <input value={newNumber} onChange={handleNumberChange} />
       </div>
-      <div>
-        <button type="submit">add</button>
-      </div>
+        <button type="submit" className="addButton">add</button>
     </form>
   );
 };
@@ -67,6 +82,8 @@ const App = () => {
   const handleNumberChange = (e) => {
     setNewNumber(e.target.value);
   }
+
+  const addedPerson = document.querySelector('.addedPerson');
 
   const handleNameChange = (e) => {
     setNewName(e.target.value);
@@ -98,6 +115,19 @@ const App = () => {
           })
           .catch(error => {
             console.error('Error updating person:', error);
+            addedPerson.innerHTML = `Error updating ${updatedPerson.name} in the phonebook`;
+            addedPerson.style.color = 'red';
+            addedPerson.style.opacity = '1';
+            addedPerson.style.transition = 'opacity 1.5s';
+            addedPerson.style.border = '1px solid red';
+            setTimeout(() => {
+              addedPerson.style.opacity = '0';
+              setTimeout(() => {
+                window.location.reload();
+              }
+              , 1000);
+            }
+            , 1500);
           });
       } else {
         setNewName('');
@@ -128,7 +158,26 @@ const App = () => {
         })
         .catch(error => {
           console.error('Error adding person:', error);
+          addedPerson.innerHTML = `Error adding ${newPerson.name} to the phonebook`;
+          addedPerson.style.color = 'red';
+          addedPerson.style.opacity = '1';
+          addedPerson.style.transition = 'opacity 1.5s';
+          addedPerson.style.border = '1px solid red';
+          setTimeout(() => {
+            addedPerson.style.opacity = '0';
+          }
+          , 1500);
         });
+        // code below adds the text "Added" {person.name} to the phonebook for 5 seconds to the DOM when a new person is added
+        addedPerson.innerHTML = `Added ${newPerson.name} to the phonebook`;
+        addedPerson.style.color = 'green';
+        addedPerson.style.opacity = '1';
+        addedPerson.style.transition = 'opacity 1.5s';
+        addedPerson.style.border = '1px solid green';
+        setTimeout(() => {
+          addedPerson.style.opacity = '0';
+        }
+        , 1500);
     }
   };
 
@@ -142,7 +191,7 @@ const App = () => {
   return (
     <div>
       <h2>Phonebook</h2>
-      <div className="addedPerson"></div>
+      <p className="addedPerson"/>
       <div>
         <Filter filter={filter} setFilter={setFilter} />
       </div>
@@ -154,7 +203,7 @@ const App = () => {
         handleNumberChange={handleNumberChange}
         addPerson={addPerson}
       />
-      <PersonList filteredPersons={filteredPersons} />
+      <PersonList filteredPersons={filteredPersons} addedPerson={addedPerson} />
       {/* Debug button to update the person list */}
       {/* <button onClick={() => personService.getAll().then(initialPersons => setPersons(initialPersons))}>Update person list</button> */}
     </div>
