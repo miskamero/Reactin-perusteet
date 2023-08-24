@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import personService  from './services/personService';
+import './App.css';
 const Filter = ({ filter, setFilter }) => {
   return (
     <div>
@@ -79,18 +80,31 @@ const App = () => {
   const addPerson = (e) => {
     e.preventDefault();
 
-    if (persons.some(person => person.name === newName)) {
-      alert(`${newName} is already added to phonebook`);
-      setNewName('');
-      setNewNumber('');
-      return;
-    } else if (newName === '') {
+    if (newName === '') {
       alert(`Please enter a name`);
       return;
     } else if (newNumber === '') {
       alert(`Please enter a number`);
       return;
-    } else if (persons.some(person => person.number === newNumber)) {
+    }else if (persons.some(person => person.name === newName && person.number !== newNumber)) { // if the person is already in the phonebook but the number is different, ask if the user wants to update the number
+      if (window.confirm(`${newName} is already added to phonebook, replace the old number with the new one?`)) {
+        const personToUpdate = persons.find(person => person.name === newName);
+        const updatedPerson = { ...personToUpdate, number: newNumber };
+        personService.update(personToUpdate.id, updatedPerson)
+          .then(returnedPerson => {
+            setPersons(persons.map(person => person.id !== personToUpdate.id ? person : returnedPerson));
+            setNewName('');
+            setNewNumber('');
+          })
+          .catch(error => {
+            console.error('Error updating person:', error);
+          });
+      } else {
+        setNewName('');
+        setNewNumber('');
+        return;
+      }
+    }else if (persons.some(person => person.number === newNumber)) {
       alert(`${newNumber} is already added to phonebook`);
       setNewNumber('');
       return;
@@ -128,6 +142,7 @@ const App = () => {
   return (
     <div>
       <h2>Phonebook</h2>
+      <div className="addedPerson"></div>
       <div>
         <Filter filter={filter} setFilter={setFilter} />
       </div>
@@ -141,7 +156,7 @@ const App = () => {
       />
       <PersonList filteredPersons={filteredPersons} />
       {/* Debug button to update the person list */}
-      <button onClick={() => personService.getAll().then(initialPersons => setPersons(initialPersons))}>Update person list</button>
+      {/* <button onClick={() => personService.getAll().then(initialPersons => setPersons(initialPersons))}>Update person list</button> */}
     </div>
   );
 };
