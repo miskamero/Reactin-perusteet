@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
+import personService  from './services/personService';
 const Filter = ({ filter, setFilter }) => {
   return (
     <div>
@@ -8,14 +8,14 @@ const Filter = ({ filter, setFilter }) => {
     </div>
   );
 };
-
 const PersonList = ({ filteredPersons }) => {
   return (
     <div>
       <h2>Numbers</h2>
-      {filteredPersons.map((person) => (
+      {filteredPersons.map((person, index) => (
         <div key={person.name}>
-          {person.name}: {person.number}
+          <p>{person.name}: {person.number}</p>
+          <button onClick={() => personService.deletePerson(person.id)}>Delete</button>
         </div>
       ))}
     </div>
@@ -53,6 +53,16 @@ const App = () => {
   const [newName, setNewName] = useState('');
   const [newNumber, setNewNumber] = useState('');
   
+  useEffect(() => {
+    personService.getAll()
+      .then(initialPersons => {
+        setPersons(initialPersons);
+      })
+      .catch(error => {
+        console.error('Error fetching data:', error);
+      });
+  }, []);
+
   const handleNumberChange = (e) => {
     setNewNumber(e.target.value);
   }
@@ -84,16 +94,21 @@ const App = () => {
       alert(`${newNumber} is already added to phonebook`);
       setNewNumber('');
       return;
+    }else if (newName.length > 40) {
+      alert(`The name must be less than 40 characters`);
+      return;
     } else if (!isValidPhoneNumber(newNumber)) {
       alert(`${newNumber} is not a valid phone number`);
       setNewNumber('');
       return;
     } else {
-      const newPerson = { name: newName, number: newNumber };
-      axios.post('http://localhost:3001/persons', newPerson)
-        .then(response => {
-          const addedPerson = response.data;
-          setPersons([...persons, addedPerson]);
+      const newPerson = {
+        name: newName,
+        number: newNumber
+      };
+      personService.create(newPerson)
+        .then(returnedPerson => {
+          setPersons(persons.concat(returnedPerson));
           setNewName('');
           setNewNumber('');
         })
@@ -102,6 +117,7 @@ const App = () => {
         });
     }
   };
+
   const filteredPersons = persons.filter(person => {
     const personName = person.name.toLowerCase(); // personName is the value of the name property of the person object. It is converted to lowercase to make the search case insensitive
     const personNumber = person.number.toLowerCase(); // personNumber is the value of the number property of the person object. It is converted to lowercase to make the search case insensitive
@@ -109,24 +125,6 @@ const App = () => {
 
     return personName.includes(filterText) || personNumber.includes(filterText); // returns true or false for each person object in the array
   });
-  useEffect(() => {
-  fetchData();
-  const intervalId = setInterval(() => {
-    fetchData();
-  }, 2000);
-  return () => clearInterval(intervalId);
-}, []);
-const fetchData = () => {
-  axios.get('http://localhost:3001/persons')
-    .then(response => {
-      setPersons(response.data);
-      console.log(response);
-    })
-    .catch(error => {
-      console.error('Error fetching data:', error);
-    });
-};
-
   return (
     <div>
       <h2>Phonebook</h2>
@@ -142,6 +140,8 @@ const fetchData = () => {
         addPerson={addPerson}
       />
       <PersonList filteredPersons={filteredPersons} />
+      {/* Debug button to update the person list */}
+      <button onClick={() => personService.getAll().then(initialPersons => setPersons(initialPersons))}>Update person list</button>
     </div>
   );
 };
