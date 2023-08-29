@@ -28,7 +28,7 @@ body {
 button {
     font-family: 'Roboto', sans-serif;
     font-size: 16px;
-    border: none;
+    border: #333 1px solid;
     border-radius: 3px;
     padding: 10px 20px;
     cursor: pointer;
@@ -49,13 +49,12 @@ button:hover {
     border-color: green;
 }
 
-button:last-child {
+button:nth-last-child(-n+2) {
     margin-left: 10px;
 }
 
 .clearButton {
     margin-top: 2px;
-    border: #333 1px solid;
 }
 
 input {
@@ -68,4 +67,23 @@ input {
     color: #333;
     transition: all 0.3s ease;
     border: 1px solid #333;
+}
+
+.confirmButton {
+    padding: 8px 16px;
+    font-size: 14px;
+    border: none;
+    cursor: pointer;
+}
+  
+.confirmButtonEnabled {
+    background-color: green;
+    border-color: green;
+    color: white;
+}
+  
+.confirmButtonDisabled {
+    background-color: red;
+    border-color: red;
+    color: white;
 }
